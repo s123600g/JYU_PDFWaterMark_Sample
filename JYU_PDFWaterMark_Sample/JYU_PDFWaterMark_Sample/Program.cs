@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace JYU_PDFWaterMark_Sample
 {
-    class Program
+    internal class Program
     {
-        public static string testHtmlContent = "<p style='margin: 0 0 0 40px;text-indent: -33px; text-align: justify;text-justify: inter-ideograph;; vertical-align: top; line-height: 22pt; font-size: 12pt; font-family: NotoSerif;'>測試PDF列印浮水印</p>";
-
+        public static string testHtmlContent = "<p style='margin: 0 0 0 40px;text-indent: -33px; text-align: justify;text-justify: inter-ideograph;; vertical-align: top; line-height: 22pt; font-size: 12pt; font-family: DFKai-sb;'>PDF 文字內容</p>";
         public static string outPutFileName = "TestWaterMark.pdf";
         public static string outPutDir = "data";
+        public static string textWaterMark = "文字浮水印測試";
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // 為.net core補足缺少編碼元件
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -24,6 +23,12 @@ namespace JYU_PDFWaterMark_Sample
 
             if (getPDFInstance.Length != 0)
             {
+                // 插入文字浮水印
+                byte[] tempPDFContent = PDF.InsertWaterMark(getPDFInstance, textWaterMark);
+
+                if (tempPDFContent.Length == 0) { throw new NullReferenceException("PDF內容為空"); }
+
+                // 產生輸出目錄位置
                 string genOutputPath = Path.Combine(Directory.GetCurrentDirectory(), outPutDir);
 
                 if (!Directory.Exists(genOutputPath))
@@ -32,7 +37,7 @@ namespace JYU_PDFWaterMark_Sample
                 }
 
                 // 儲存PDF檔案
-                PDF.SavePDF(genOutputPath, outPutFileName, getPDFInstance);
+                PDF.SavePDF(genOutputPath, outPutFileName, tempPDFContent);
             }
         }
     }
